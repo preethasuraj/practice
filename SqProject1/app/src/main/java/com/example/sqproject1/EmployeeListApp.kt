@@ -1,4 +1,7 @@
 package com.example.sqproject1
 
-class EmployeeListApp {
-}
+import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
+class EmployeeListApp: Application()

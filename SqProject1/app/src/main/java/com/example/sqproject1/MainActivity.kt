@@ -11,7 +11,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.sqproject1.ui.EmployeeListScreen
+import com.example.sqproject1.ui.Screen
 import com.example.sqproject1.ui.theme.SqProject1Theme
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,14 +28,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SqProject1Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+               EmployeeAppNavHost()
             }
         }
+    }
+}
+
+@Composable
+fun EmployeeAppNavHost() {
+    val navHostController = rememberNavController()
+    NavHost(navHostController, startDestination = Screen.EmployeeList) {
+        composable<Screen.EmployeeList> {
+            EmployeeListScreen()
+        }
+
     }
 }
 
