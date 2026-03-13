@@ -26,13 +26,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.example.practice2.R
@@ -40,16 +40,22 @@ import com.example.practice2.network.Employee
 import com.example.practice2.network.EmployeesList
 
 @Composable
-fun EmployeeListScreen(vm: EmployeeListViewModel) {
+fun EmployeeListScreen(vm: EmployeeListViewModel = hiltViewModel(), onRowClick: (String) -> Unit) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val refreshing by vm.refreshing.collectAsStateWithLifecycle()
 
-    EmployeeScreenStateless(uiState, { vm.fetchData() })
+    EmployeeScreenStateless(uiState, { vm.fetchData() }, refreshing, onRowClick)
 }
 
 @Composable
-fun EmployeeScreenStateless(uiState: UiState, onRefresh: () -> Unit) {
+fun EmployeeScreenStateless(
+    uiState: UiState,
+    onRefresh: () -> Unit,
+    refreshing: Boolean,
+    onRowClick: (String) -> Unit
+) {
     PullToRefreshBox(
-        isRefreshing = uiState == UiState.Loading,
+        isRefreshing = refreshing,
         onRefresh = onRefresh,
         modifier = Modifier
             .fillMaxSize()
@@ -59,7 +65,7 @@ fun EmployeeScreenStateless(uiState: UiState, onRefresh: () -> Unit) {
             UiState.Empty -> EmptyList()
             is UiState.Error -> ErrorScreen(onRefresh)
             UiState.Loading -> LoadingScreen()
-            is UiState.Success -> EmployeeList(uiState.employees)
+            is UiState.Success -> EmployeeList(uiState.employees, onRowClick)
         }
 
     }
@@ -113,40 +119,47 @@ fun LoadingScreen() {
 
 @Preview
 @Composable
-fun EmployeeList(employees: EmployeesList = EmployeesList(
-    listOf(
-        Employee(
-            name = "name",
-            uuid = "222",
-            email = "email" ,
-            smallUrl = ""
+fun EmployeeList(
+    employees: EmployeesList = EmployeesList(
+        listOf(
+            Employee(
+                name = "name",
+                uuid = "222",
+                email = "email",
+                smallUrl = "",
+                largeUrl = ""
+            )
         )
-    )
-)) {
+    ), onRowClick: (String) -> Unit = {}
+) {
     LazyColumn(modifier = Modifier
         .padding(5.dp)) {
         items(
             items = employees.employees,
             key = {it.uuid}){
-            EmployeeRow(it)
+            EmployeeRow(it, onRowClick)
         }
 
     }
 }
 @Preview()
 @Composable
-fun EmployeeRow(employee: Employee = Employee(
-    name = "name",
-    uuid = "222",
-    email = "," ,
-    smallUrl = ""
-)) {
+fun EmployeeRow(
+    employee: Employee = Employee(
+        name = "name",
+        uuid = "222",
+        email = ",",
+        smallUrl = "",
+        largeUrl = ""
+    ), onRowClick: (String) -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(3.dp)
             .semantics(mergeDescendants = true, properties = {}),
-        elevation = CardDefaults.cardElevation(3.dp)
+        elevation = CardDefaults.cardElevation(3.dp),
+        onClick = { onRowClick(employee.uuid) }
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()

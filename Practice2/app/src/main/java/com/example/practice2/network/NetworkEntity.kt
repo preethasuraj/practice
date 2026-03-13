@@ -9,7 +9,9 @@ data class Employee(
     val email: String,
     val uuid: String,
     @SerializedName("photo_url_small")
-    val smallUrl: String
+    val smallUrl: String,
+    @SerializedName("photo_url_large")
+    val largeUrl: String,
 )
 
 data class EmployeesList(

@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     // Coil
     implementation(libs.coil.compose)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.coil.network.okhttp)
 
 }
